@@ -1,0 +1,291 @@
+  function toggleTheme() {
+      const body = document.body;
+      const themeBtn = document.getElementById('themeBtn');
+      
+      if (body.getAttribute('data-theme') === 'light') {
+        body.removeAttribute('data-theme');
+        themeBtn.innerHTML = '<span>🌙</span> Modo Escuro';
+      } else {
+        body.setAttribute('data-theme', 'light');
+        themeBtn.innerHTML = '<span>☀️</span> Modo Claro';
+      }
+    }
+
+    // Coordenadas base
+    const BASE_LOCATIONS = {
+      "Praia Grande / Reviver": { x: 42.0, y: 38.0 },
+      "Rua do Giz / Desterro": { x: 44.5, y: 40.5 },
+      "Praça Maria Aragão / Deodoro": { x: 39.0, y: 35.0 },
+      "Teatro Arthur Azevedo": { x: 46.0, y: 36.5 },
+      "Biblioteca Benedito Leite / Campo de Ourique": { x: 48.0, y: 41.0 },
+      "Rua de Santana / Centro": { x: 43.0, y: 33.0 },
+      "Praça da Faustina / Portinho": { x: 40.5, y: 43.0 },
+      "UFMA - Bacanga": { x: 32.0, y: 64.0 },
+      "Itaqui-Bacanga / Anjo da Guarda": { x: 26.0, y: 55.0 },
+      "UEMA - Campus Paulo VI": { x: 74.0, y: 56.0 },
+      "Tirirical / Aeroporto": { x: 68.0, y: 62.0 },
+      "IFMA - Monte Castelo": { x: 52.0, y: 48.0 },
+      "Bairro Ivar Saldanha / Alemanha": { x: 57.0, y: 52.0 },
+      "Madre Deus": { x: 49.0, y: 45.0 },
+      "Bairro de Fátima / Monte Castelo": { x: 54.0, y: 44.0 },
+      "Maracanã / Zona Rural": { x: 80.0, y: 72.0 },
+      "Turu / Cohama": { x: 58.0, y: 32.0 },
+      "Renascença / Ponta d'Areia": { x: 36.0, y: 26.0 },
+      "Calhau / Litorânea": { x: 48.0, y: 22.0 },
+      "Cohatrac / Maiobinha": { x: 70.0, y: 40.0 }
+    };
+
+    // Banco de dados com fotos reais da internet (onde disponíveis) e sem imagem quando inexistente
+    const womenData = [
+      // NÍVEL 1 - Históricas (15)
+      { id: 1, name: "Maria Firmina dos Reis", level: 1, area: "Literatura, Educação e Abolicionismo", baseLoc: "Praia Grande / Reviver", locationLabel: "Centro Histórico (Praia Grande)", period: "1825 – 1917", impact: "Pioneira na literatura abolicionista brasileira e fundadora da primeira escola mista do Maranhão.", cat: "Mulheres Históricas", subcat: "Literatura e Direitos Humanos", bio: "Escritora e educadora maranhense. Autora de 'Úrsula' (1859), considerado o primeiro romance da literatura abolicionista do Brasil.", img: "https://chc.org.br/wp-content/uploads/2020/06/historia_311.jpg" },
+      { id: 2, name: "Ana Jansen", level: 1, area: "História, Sociedade e Economia", baseLoc: "Praia Grande / Reviver", locationLabel: "Solar Ana Jansen", period: "1787 – 1869", impact: "Comerciante e figura política de forte relevância social e econômica no século XIX.", cat: "Mulheres Históricas", subcat: "História e Economia", bio: "Figura emblemática da aristocracia colonial em São Luís. Administrou extensas propriedades rurais e comerciais, tornando-se lenda no imaginário popular.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgSlgU3vRBac9F2l5GtWtnpi0XGcyu0RgaAsFrZfawIOsv1Pb-XMIcxQs&s=10" },
+      { id: 3, name: "Maria Aragão", level: 1, area: "Medicina e Direitos Sociais", baseLoc: "Praça Maria Aragão / Deodoro", locationLabel: "Praça Maria Aragão", period: "1910 – 1991", impact: "Luta incansável pela saúde pública, igualdade social e direitos políticos.", cat: "Mulheres Históricas", subcat: "Medicina e Política", bio: "Médica e militante política perseguida durante a ditadura. Sua trajetória em defesa das populações vulneráveis inspira o memorial no centro de São Luís.", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhyJk8rXBCroS880aciAdQwicNA1N6FRZL3OtuFgmiMM2XaKz_NVGNjaPAXgVDUO9Y0uouowfvPtkA8Z4eGlg2tbPdqYJrjeLm9BI-SLSJequ19Pu1AesNgNFjFJGHsStrBRfmPgeOTaz8/s1600/Captura+de+Tela+2020-04-16+a%25CC%2580s+21.31.09.png" },
+      { id: 4, name: "Terezinha Rêgo", level: 1, area: "Medicina e Ciência", baseLoc: "UFMA - Bacanga", locationLabel: "Herbário ÁTICO SEABRA (UFMA)", period: "1933 – 2024", impact: "Referência nacional na fitoterapia e estudo de plantas medicinais do Maranhão.", cat: "Mulheres Históricas", subcat: "Ciência e Botânica", bio: "Doutora em Botânica e docente da UFMA. Dedicou sua vida ao mapeamento de espécies medicinais da Amazônia Maranhense e do Cerrado.", img: "https://s2-g1.glbimg.com/LRgulLN9wm6A1WmU8sO4obuOZpo=/0x0:620x435/1008x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2024/o/S/ALEE7lS3ueb9XjtP0kTQ/terezinharego-1-.jpg" },
+      { id: 5, name: "Laura Rosa", level: 1, area: "Literatura e Educação", baseLoc: "Biblioteca Benedito Leite / Campo de Ourique", locationLabel: "Biblioteca Benedito Leite", period: "1884 – 1976", impact: "Pioneira na imprensa feminina e defesa da instrução pública para mulheres.", cat: "Mulheres Históricas", subcat: "Literatura e Educação", bio: "Poetisa, cronista e professora. Fundou jornais dedicados ao público feminino e defendeu ativamente a educação emancipatória.", img: "" },
+      { id: 6, name: "Rosa Castro", level: 1, area: "Educação e Humanidades", baseLoc: "Rua de Santana / Centro", locationLabel: "Centro Histórico", period: "1907 – 1988", impact: "Formação de gerações de intelectuais e desenvolvimento pedagógico da capital.", cat: "Mulheres Históricas", subcat: "Educação", bio: "Educadora maranhense de destaque, dedicada à modernização das práticas do ensino público e preservação da memória escolar.", img: "" },
+      { id: 7, name: "Dagmar Desterro", level: 1, area: "Literatura e Poesia", baseLoc: "Rua do Giz / Desterro", locationLabel: "Bairro do Desterro", period: "1925 – 2004", impact: "Contribuição para a poesia lírica e resgate lírico do cotidiano maranhense.", cat: "Mulheres Históricas", subcat: "Literatura", bio: "Escritora de poesia e prosa, cujas obras homenageiam a arquitetura, a atmosfera e os costumes do Centro Histórico de São Luís.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiRyc-YK2UjVNXYV7FkqxImLBvKUz9wCiDtR5e6OWrXsThoU5UDoPAD8I&s=10" },
+      { id: 8, name: "Virgínia Rayol Braga", level: 1, area: "Literatura e Jornalismo", baseLoc: "Renascença / Ponta d'Areia", locationLabel: "Bairro Renascença", period: "1861 – 1934", impact: "Abertura de espaço para a escrita e jornalismo feito por mulheres no século XIX.", cat: "Mulheres Históricas", subcat: "Literatura", bio: "Integrou periódicos maranhenses e contribuiu significativamente para o movimento literário da Atenas Brasileira.", img: "" },
+      { id: 9, name: "Lucy Teixeira", level: 1, area: "Literatura e Modernismo", baseLoc: "Teatro Arthur Azevedo", locationLabel: "Teatro Arthur Azevedo", period: "1922 – 2007", impact: "Modernização e vanguarda do pensamento poético no estado.", cat: "Mulheres Históricas", subcat: "Poesia e Crítica", bio: "Poetisa e romancista. Foi uma das raras presenças femininas nos movimentos de modernização poética do Maranhão no século XX.", img: "https://www.antoniomiranda.com.br/poesia_brasis/maranhao/img/lucy_teixeira.jpg" },
+      { id: 10, name: "Conceição Neves Aboud", level: 1, area: "Literatura e Memória", baseLoc: "Calhau / Litorânea", locationLabel: "Calhau", period: "1916 – 2005", impact: "Preservação da memória cultural em obras memorialísticas e líricas.", cat: "Mulheres Históricas", subcat: "Literatura", bio: "Autora de importantes registros poéticos e crônicas sobre a transformação urbana e cultural de São Luís ao longo dos anos.", img: "https://dinodealcantarablog.wordpress.com/wp-content/uploads/2022/02/conceicao-aboud.png?w=456" },
+      { id: 11, name: "Mundinha Araújo", level: 1, area: "História e Movimento Negro", baseLoc: "Bairro de Fátima / Monte Castelo", locationLabel: "Centro de Cultura Negra (CCN)", period: "1932 – Presente", impact: "Cofundadora do Centro de Cultura Negra do Maranhão (CCN-MA).", cat: "Mulheres Históricas", subcat: "Militância Negra", bio: "Historiadora, pesquisadora e ativista fundamental para a valorização e afirmação da herança afro-maranhense.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxoLVVNyZZNwS4fz_KCVaIjmLzBEReUFFn4V8FwzMqfHn-TEPEXkIqEIhS&s=10" },
+      { id: 12, name: "Maria Michol Pinho de Carvalho", level: 1, area: "Pesquisa Folclórica", baseLoc: "Madre Deus", locationLabel: "Bairro Madre Deus", period: "1940 – 2007", impact: "Mapeamento e documentação sistemática de ritmos e festas tradicionais.", cat: "Mulheres Históricas", subcat: "Folclore", bio: "Antropóloga e pesquisadora que dedicou décadas ao registro fonográfico e gráfico dos festejos de Bumba Meu Boi e Tambor de Crioula.", img: "" },
+      { id: 13, name: "Therezinha Jansen", level: 1, area: "Cultura Popular", baseLoc: "Praça da Faustina / Portinho", locationLabel: "Praça da Faustina", period: "1928 – 2012", impact: "Organização estrutural dos grupos de Bumba Meu Boi da capital.", cat: "Mulheres Históricas", subcat: "Bumba Meu Boi", bio: "Produtora e organizadora cultural, teve papel decisivo na estruturação dos circuitos e apresentações de Bumba Meu Boi em São Luís.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJupwdvdtuQr28OLwWj-QsdWIZoDeaw_fRxeW1jqqMtnKRCAD33ACYFfaE&s=10" },
+      { id: 14, name: "Dona Teté (Maria José de Jesus)", level: 1, area: "Cacuriá e Dança Popular", baseLoc: "Rua do Giz / Desterro", locationLabel: "Laborarte / Rua do Giz", period: "1924 – 2011", impact: "Criadora e revitalizadora da vertente moderna do Cacuriá maranhense.", cat: "Mulheres Históricas", subcat: "Cacuriá", bio: "Mestra da cultura popular. Transformou a dança do Cacuriá em símbolo nacional com a expressão das caixeiras do Divino Espírito Santo.", img: "https://upload.wikimedia.org/wikipedia/commons/5/54/Cacuria_dona_tete_tatiana_reis.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original" },
+      { id: 15, name: "Raimunda Pereira (Dica)", level: 1, area: "Patrimônio Imaterial", baseLoc: "Madre Deus", locationLabel: "Madre Deus", period: "1918 – 2001", impact: "Guardiã das celebrações tradicionais da comunidade do bairro Madre Deus.", cat: "Mulheres Históricas", subcat: "Patrimônio Imaterial", bio: "Liderança comunitária de relevância histórica no acolhimento de manifestações folclóricas e festejos juninos da Ilha.", img: "" },
+
+      // NÍVEL 2 - Cultura (20)
+      { id: 16, name: "Rosa Reis", level: 2, area: "Música e Cacuriá", baseLoc: "Rua do Giz / Desterro", locationLabel: "Laborarte (Rua do Giz)", period: "Contemporânea", impact: "Divulgação nacional dos ritmos maranhenses e da obra de Dona Teté.", cat: "Mulheres na Cultura", subcat: "Música Popular", bio: "Cantora, atriz e pesquisadora. Diretora del Laborarte, é uma das maiores vozes na preservação do Cacuriá e Tambor de Crioula.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy0nIJI2JQgjhUBhFRTbAhcvVJ0-2FZ4HXCp9fDjg0E3E78zUZimgir7HN&s=10" },
+      { id: 17, name: "Patativa (Maria do Socorro Silva)", level: 2, area: "Composição Popular", baseLoc: "Madre Deus", locationLabel: "Madre Deus", period: "1937 – 2015", impact: "Composição de sambas e toadas célebres da cultura ludovicense.", cat: "Mulheres na Cultura", subcat: "Composição Popular", bio: "Compositora e sambista de talento singular. Suas letras retratam com sensibilidade a vida e o cotidiano da periferia e da tradição maranhense.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaU_spOEXApZ4z85l36jEDs-_SJjkZfpvjPlymcmYd0biPQ6a0QaR96r-o&s=10" },
+      { id: 18, name: "Mestra Roxa Belfort", level: 2, area: "Tambor de Crioula", baseLoc: "Bairro Ivar Saldanha / Alemanha", locationLabel: "Ivar Saldanha", period: "Contemporânea", impact: "Mestra da salvaguarda e transmissão do Tambor de Crioula.", cat: "Mulheres na Cultura", subcat: "Tambor de Crioula", bio: "Liderança tradicional de Tambor de Crioula, promovendo rodas e oficinas para gerações jovens de dançadeiras e tamborzeiros.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNbOmD-Igcto9QWQFFK6c0RKGSkgxkyRNLhlBvBCgInXRhRolm2FC5rVuo&s=10" },
+      { id: 19, name: "Carla Coreira", level: 2, area: "Dança Tradicional", baseLoc: "Praça da Faustina / Portinho", locationLabel: "Praça da Faustina", period: "Contemporânea", impact: "Fortalecimento da presença feminina na liderança do Tambor de Crioula.", cat: "Mulheres na Cultura", subcat: "Dança Tradicional", bio: "Dançadeira e articuladora da salvaguarda do Tambor de Crioula, atuando diretamente em projetos do Centro Histórico.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScJmDa5X4NJT_Bp1iyUJ_FrcD6aqej2YCNenJw-fXrumyzt3Ai92KI1hwi&s=10" },
+      { id: 20, name: "Mestra Duca", level: 2, area: "Bordado Tradicional", baseLoc: "Maracanã / Zona Rural", locationLabel: "Boi do Maracanã", period: "Contemporânea", impact: "Preservação da arte dos bordados em canutilhos no Bumba Meu Boi.", cat: "Mulheres na Cultura", subcat: "Artesanato Folclórico", bio: "Bordadeira principal e Mestra artesã do Bumba Meu Boi de Maracanã (Sotaque de Matraca).", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbNvdS6wpENsIerkKXqMh5qmMyrH9Aral6ly3FCAuD-TV4hJv8VdYr-aU&s=10" },
+      { id: 21, name: "Mestra Maria do Rosário", level: 2, area: "Bumba Meu Boi", baseLoc: "Cohatrac / Maiobinha", locationLabel: "Região do Cohatrac", period: "Contemporânea", impact: "Manutenção do Sotaque de Orquestra nos festejos juninos.", cat: "Mulheres na Cultura", subcat: "Bumba Meu Boi", bio: "Mestra e articuladora junina, referência no comando de batalhões do folclore regional.", img: "" },
+      { id: 22, name: "Mestra Ana Lice", level: 2, area: "Canto Folclórico", baseLoc: "Madre Deus", locationLabel: "Madre Deus", period: "Contemporânea", impact: "Perpetuação da tradição oral e composições do Bumba Meu Boi.", cat: "Mulheres na Cultura", subcat: "Canto Folclórico", bio: "Cantadeira respeitada nos arraiais de São Luís, reconhecida pela potência vocal e preservação de toadas antigas.", img: "" },
+      { id: 23, name: "Mestra Isabel", level: 2, area: "Tradição Junina", baseLoc: "Turu / Cohama", locationLabel: "Turu", period: "Contemporânea", impact: "Organização comunitária de grupos culturais tradicionais.", cat: "Mulheres na Cultura", subcat: "Bumba Meu Boi", bio: "Matriarca de grupo folclórico, responsável pelo repasse de saberes sobre indumentárias e ritmos ancestrais.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDf9RSM1KvL5udSQozb9gMTJP-cPtBORM982Hotqk1O9rqARCA4XJ60UU&s=10" },
+      { id: 24, name: "Zelinda Lima", level: 2, area: "Gastronomia Tradicional", baseLoc: "Praia Grande / Reviver", locationLabel: "Mercado Central / Praia Grande", period: "Contemporânea", impact: "Difusão e salvaguarda do Arroz de Cuchá e receitas históricas.", cat: "Mulheres na Cultura", subcat: "Gastronomia", bio: "Pesquisadora da culinária maranhense, destacada no registro das influências indígenas e africanas na cozinha local.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFNWAPOb56x36YN5NB8Oiv2KEY_HB27dkBaiAE-Gw0FJb__6y9SYjm6Y4&s=10" },
+      { id: 25, name: "Kátia Bogéa", level: 2, area: "Gestão do Patrimônio", baseLoc: "Praia Grande / Reviver", locationLabel: "Superintendência do IPHAN", period: "Contemporânea", impact: "Gestão do tombamento de São Luís como Patrimônio da Humanidade (UNESCO).", cat: "Mulheres na Cultura", subcat: "Gestão Cultural", bio: "Historiadora e ex-presidente do IPHAN. Atuou ativamente em projetos de revitalização do acervo arquitetônico da capital.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvKbpYNTk0ydiKWv-2fmbDY7jkiAxvDNuduJkQI2Ik1g&s=10" },
+      { id: 26, name: "Lenita Estrela de Sá", level: 2, area: "Dramaturgia e Teatro", baseLoc: "Teatro Arthur Azevedo", locationLabel: "Teatro Arthur Azevedo", period: "Contemporânea", impact: "Criação de obras cênicas focadas nas lendas e história do Maranhão.", cat: "Mulheres na Cultura", subcat: "Teatro", bio: "Dramaturga e escritora. Escreveu clássicos teatrais encenados nos palcos maranhenses.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJYDCQJUjh2BSo1u5shDsqgV-Jo5zUngd5R_L3SNpGn6BBqo4zf02cJNIg&s=10" },
+      { id: 27, name: "Arlete Nogueira Machado", level: 2, area: "Poesia e Literatura", baseLoc: "Biblioteca Benedito Leite / Campo de Ourique", locationLabel: "Academia Maranhense de Letras", period: "Contemporânea", impact: "Reconhecimento nacional por publicações líricas.", cat: "Mulheres na Cultura", subcat: "Poesia", bio: "Poetisa e imortal da Academia Maranhense de Letras. Obra caracterizada pela sensibilidade e refinamento da linguagem.", img: "https://quatete.wordpress.com/wp-content/uploads/2018/05/arlete-noguera-foto-francisco-silva.jpg" },
+      { id: 28, name: "Dilercy Adler", level: 2, area: "Literatura e Psicologia", baseLoc: "Renascença / Ponta d'Areia", locationLabel: "Renascença", period: "Contemporânea", impact: "Organização de coletivas de escritoras maranhenses.", cat: "Mulheres na Cultura", subcat: "Poesia e Psicologia", bio: "Psicóloga, poetisa e ensaísta. Fundadora de movimentos de fomento à produção de livros escritos por mulheres.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9pwhP_oHO2NAPx3GdT956vQT29rdVhBeFUr-k7MfHqDPmo22dzor1LGof&s=10" },
+      { id: 29, name: "Laura Amélia Damous", level: 2, area: "Poesia Contemporânea", baseLoc: "Calhau / Litorânea", locationLabel: "Calhau", period: "Contemporânea", impact: "Renovação do panorama poético maranhense.", cat: "Mulheres na Cultura", subcat: "Poesia", bio: "Escritora de poesia contemporânea com premiações e presença marcante no cenário literário ludovicense.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRP65CmTYtLhVv0x08CPGxqH15rgMjJutJbga5EteMY7VW38zniTeHRMRvC&s=10" },
+      { id: 30, name: "Ceres Costa Fernandes", level: 2, area: "Crônica e Prosa", baseLoc: "Biblioteca Benedito Leite / Campo de Ourique", locationLabel: "Academia Maranhense de Letras", period: "Contemporânea", impact: "Incentivo à formação de novos leitores e preservação da prosa local.", cat: "Mulheres na Cultura", subcat: "Literatura", bio: "Romancista, cronista e membro da Academia Maranhense de Letras.", img: "https://portaloinformante.com.br/wp-content/uploads/2025/10/IMG-20251009-WA0047-911x1024.jpg" },
+      { id: 31, name: "Sônia Almeida", level: 2, area: "Crônica e Ensaios", baseLoc: "Praça Maria Aragão / Deodoro", locationLabel: "Rua Grande / Deodoro", period: "Contemporânea", impact: "Registros literários do cotidiano do Centro de São Luís.", cat: "Mulheres na Cultura", subcat: "Crônica", bio: "Autora atenta às histórias urbanas e transformações sociais da área central da capital.", img: "https://diegoemir.com/wp-content/uploads/2024/02/IMG_8312.jpeg" },
+      { id: 32, name: "Jucey Santana", level: 2, area: "Resgate do Imaginário Popular", baseLoc: "Rua de Santana / Centro", locationLabel: "Rua de Santana", period: "Contemporânea", impact: "Documentação escrita do folclore e contos da Ilha.", cat: "Mulheres na Cultura", subcat: "Memória Oral", bio: "Escritora dedicadamente voltada à compilação de lendas, mitos e memórias da tradição oral maranhense.", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjd1_OorlW46DBosbiS8OO1Yh2SOlqrRRvW5Llhy5hHEqzgQCN6-CEyidaktLr_9gQfscHDB4-gkMddJcMUO8CrixCkhDBg8jScN3nfIkhG6iJyvHw9IUeXOTlc8G_UMTD6Ndr5cCFE5gM/s2048/JUCEY+SANTANA.jpg" },
+      { id: 33, name: "Wanda Cunha", level: 2, area: "Literatura Infanto-Juvenil", baseLoc: "Cohatrac / Maiobinha", locationLabel: "Cohatrac", period: "Contemporânea", impact: "Formação leitora infantojuvenil com inspiração regional.", cat: "Mulheres na Cultura", subcat: "Literatura Infantil", bio: "Educadora e escritora de livros infantis que utilizam mitos e folclore maranhenses como elemento pedagógico.", img: "https://static.wixstatic.com/media/164ab9_9d736ce1dfeb43f4b35bd621bee39d55~mv2.jpg/v1/crop/x_55,y_51,w_450,h_560/fill/w_184,h_199,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/164ab9_9d736ce1dfeb43f4b35bd621bee39d55~mv2.jpg" },
+      { id: 34, name: "Lindevania Martins", level: 2, area: "Literatura de Ficcão", baseLoc: "Praça Maria Aragão / Deodoro", locationLabel: "Defensoria Pública do Estado", period: "Contemporânea", impact: "Prosa focada em equidade de gênero e direitos sociais.", cat: "Mulheres na Cultura", subcat: "Conto e Poesia", bio: "Defensora pública e escritora premiada nacionalmente por seus contos sobre questões de gênero.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkIWSkLQZ2Ut1sKQ3Y58ocknyuRmo3ZI09q6uM_fFtCOwVMQefZ41neeA&s=10" },
+      { id: 35, name: "Sônia Amaral", level: 2, area: "Ensaios Literários e Direito", baseLoc: "Calhau / Litorânea", locationLabel: "Fórum de São Luís (Calhau)", period: "Contemporânea", impact: "Publicações sobre direitos e humanidades.", cat: "Mulheres na Cultura", subcat: "Literatura", bio: "Magistrada, articulista e autora participante de coletâneas culturais do Maranhão.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkD3yVCP_2AyzraHNzwZZT5WHv5tyO2kmO5crBcPSc0BvgTthPPCQCRow&s=10" },
+
+      // NÍVEL 3 - Contemporâneas (15)
+      { id: 36, name: "Ceres Murad", level: 3, area: "Gestão Educacional", baseLoc: "Renascença / Ponta d'Areia", locationLabel: "Campus Universitário Renascença", period: "Contemporânea", impact: "Inovação pedagógica e desenvolvimento do ensino superior público e privado.", cat: "Mulheres Contemporâneas", subcat: "Educação", bio: "Educadora e gestora universitária. Atuou fortemente na modernização metodológica da educação em São Luís.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnfzj7bwKEg85W71FAbWT39nxYE4BuxAYp7YJREnQ6krTSSkHlCiIAI3fc&s=10" },
+      { id: 37, name: "Luciane Maria Oliveira Brito", level: 3, area: "Medicina e Pesquisa Clínica", baseLoc: "UFMA - Bacanga", locationLabel: "Hospital Universitário (UFMA)", period: "Contemporânea", impact: "Pesquisas avançadas na saúde da mulher e combate ao câncer do colo do útero.", cat: "Mulheres Contemporâneas", subcat: "Medicina", bio: "Professora Titular da UFMA e pesquisadora em ginecologia, liderando programas de prevenção de saúde feminina no estado.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6QQEQnw9lRegE6g2VL2T35f0oSMb5PKtEgCjRHcWjYI4WXEWBtglats4&s=10" },
+      { id: 38, name: "Ana Angélica Macêdo", level: 3, area: "Tecnologia Assistiva", baseLoc: "IFMA - Monte Castelo", locationLabel: "IFMA Monte Castelo", period: "Contemporânea", impact: "Desenvolvimento de tecnologias inclusivas para pessoas com deficiência.", cat: "Mulheres Contemporâneas", subcat: "Tecnologia", bio: "Professora e pesquisadora do IFMA, focada em engenharia voltada à acessibilidade e inclusão digital.", img: "https://i1.rgstatic.net/ii/profile.image/602597346000896-1520681811199_Q512/Ana-Angelica-Macedo.jpg" },
+      { id: 39, name: "Zafira de Almeida", level: 3, area: "Oceanografia e Ecologia", baseLoc: "UEMA - Campus Paulo VI", locationLabel: "UEMA Paulo VI", period: "Contemporânea", impact: "Estudos essenciais para preservação dos manguezais e recursos pesqueiros maranhenses.", cat: "Mulheres Contemporâneas", subcat: "Ciência", bio: "Doutora em Ciências do Mar e docente da UEMA, referência na preservação do ecossistema costeiro do estado.", img: "https://s2-g1.glbimg.com/_Gv9sGuJVeCgu4QWFo9xaNWScF8=/0x0:560x406/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2021/n/3/DYFYpeRrCesUEB8kZGdw/zafira.jpg" },
+      { id: 40, name: "Maria Consuelo Alves Lima", level: 3, area: "Física e Formação Científica", baseLoc: "UFMA - Bacanga", locationLabel: "Departamento de Física (UFMA)", period: "Contemporânea", impact: "Incentivo à inserção de jovens mulheres nas ciências exatas.", cat: "Mulheres Contemporâneas", subcat: "Física", bio: "Docente de Física na UFMA. Desenvolve projetos de divulgação científica voltados para alunas da rede pública escolar.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt6DO6GDsr7l5xTrIq5FL2ILCYaSL_Xnf_Npv_iPkzVj_hMnK-4XrxRgkQ&s=10" },
+      { id: 41, name: "Regina Célia de Sousa", level: 3, area: "Nanotecnologia e Física", baseLoc: "UFMA - Bacanga", locationLabel: "Laboratório de Materiais (UFMA)", period: "Contemporânea", impact: "Avanço da pesquisa em novos materiais na Região Nordeste.", cat: "Mulheres Contemporâneas", subcat: "Ciência", bio: "Pesquisadora e professora universitária, atuante em física da matéria condensada e nanotecnologia.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRW3JLIXjwhlMrDAYyiY-KctYOkWg2NsrwgQPtpRA5HlQ&s=10" },
+      { id: 42, name: "Fabiane Carvalho", level: 3, area: "Capoeira e Inclusão Social", baseLoc: "Itaqui-Bacanga / Anjo da Guarda", locationLabel: "Anjo da Guarda", period: "Contemporânea", impact: "Ações de desenvolvimento social para a juventude periférica por meio da capoeira.", cat: "Mulheres Contemporâneas", subcat: "Esporte e Sociedade", bio: "Mestra de Capoeira e educadora social. Lidera núcleos esportivos e culturais na área do Itaqui-Bacanga.", img: "" },
+      { id: 43, name: "Flaviane Carvalho", level: 3, area: "Cultura Urbana e Capoeira", baseLoc: "Itaqui-Bacanga / Anjo da Guarda", locationLabel: "Área Itaqui-Bacanga", period: "Contemporânea", impact: "Empoderamento de mulheres em artes marciais tradicionais.", cat: "Mulheres Contemporâneas", subcat: "Cultura Urbana", bio: "Ativista e capoeirista. Promove oficinas afirmativas focado no protagonismo feminino nas manifestações de rua.", img: "" },
+      { id: 44, name: "Maria Lúcia Gato", level: 3, area: "Teatro Comunitário", baseLoc: "Teatro Arthur Azevedo", locationLabel: "Teatro Arthur Azevedo", period: "Contemporânea", impact: "Descentralização das artes cênicas para bairros populares.", cat: "Mulheres Contemporâneas", subcat: "Artes Cênicas", bio: "Atriz, diretora teatral e produtora. Atua na realização de oficinas dramáticas em comunidades ludovicenses.", img: "" },
+      { id: 45, name: "Nubiragina Salasar", level: 3, area: "Salvaguarda do Tambor de Crioula", baseLoc: "Praça da Faustina / Portinho", locationLabel: "Centro Histórico", period: "Contemporânea", impact: "Oficinas em escolas públicas para preservação do patrimônio imaterial.", cat: "Mulheres Contemporâneas", subcat: "Tambor de Crioula", bio: "Mestra e dançadeira tradicional de Tambor de Crioula, empenhada em repassar o ritmo aos jovens da capital.", img: "" },
+      { id: 46, name: "Janete Mota Lima", level: 3, area: "Defesa da Diversidade Religiosa", baseLoc: "Bairro Ivar Saldanha / Alemanha", locationLabel: "Terreiro em Ivar Saldanha", period: "Contemporânea", impact: "Combate à intolerância religiosa e preservação do Tambor de Mina.", cat: "Mulheres Contemporâneas", subcat: "Direitos Humanos", bio: "Liderança de terreiro e militante na preservação e respeito às tradições afro-maranhenses de matriz africana.", img: "" },
+      { id: 47, name: "Josilene Brandão", level: 3, area: "Direitos Humanos e Coletivos", baseLoc: "Tirirical / Aeroporto", locationLabel: "Tirirical", period: "Contemporânea", impact: "Articulação de redes de mulheres negras da grande ilha.", cat: "Mulheres Contemporâneas", subcat: "Ação Social", bio: "Militante de movimentos sociais de base, atuante na defesa de territórios e direitos da mulher negra.", img: "" },
+      { id: 48, name: "Joanna Karla Ferreira", level: 3, area: "Agricultura Familiar", baseLoc: "Maracanã / Zona Rural", locationLabel: "Comunidades Rurais da Zona Rural", period: "Contemporânea", impact: "Fortalecimento das mulheres agricultoras e comunidades quilombolas.", cat: "Mulheres Contemporâneas", subcat: "Ação Social", bio: "Líder comunitária focada no desenvolvimento sustentável e apoio técnico para produtoras rurais da Ilha.", img: "" },
+      { id: 49, name: "Jessica Barbosa", level: 3, area: "Mobilização Jovem", baseLoc: "Turu / Cohama", locationLabel: "Região do Turu", period: "Contemporânea", impact: "Criação de redes de acolhimento e cultura para a juventude periférica.", cat: "Mulheres Contemporâneas", subcat: "Juventude", bio: "Mobilizadora social atuante em projetos de incentivo à permanência escolar e artística de jovens em São Luís.", img: "" },
+      { id: 50, name: "Raimunda Nonata Pinto", level: 3, area: "Tradição Folclórica", baseLoc: "Madre Deus", locationLabel: "Madre Deus", period: "Contemporânea", impact: "Perpetuação do patrimônio cultural comunitário no bairro Madre Deus.", cat: "Mulheres Contemporâneas", subcat: "Cultura Popular", bio: "Mestra popular e gestora cultural comunitária com dedicação diária às festas folclóricas de São Luís.", img: "" }
+    ];
+
+    function renderApp(filteredData) {
+      const womenListDiv = document.getElementById('womenList');
+      const pinsLayer = document.getElementById('pinsLayer');
+      
+      womenListDiv.innerHTML = '';
+      pinsLayer.innerHTML = '';
+
+      const regionCounters = {};
+
+      filteredData.forEach((woman) => {
+        const card = document.createElement('div');
+        card.className = 'woman-card';
+        card.onclick = () => openModal(woman);
+        
+        const avatarHtml = woman.img 
+          ? `<img src="${woman.img}" alt="${woman.name}">`
+          : ``;
+
+        card.innerHTML = `
+          <div class="avatar-container">${avatarHtml}</div>
+          <div class="woman-card-info">
+            <h4>${woman.name}</h4>
+            <p>${woman.area}</p>
+            <span class="badge badge-${woman.level}">Nível ${woman.level}</span>
+          </div>
+        `;
+        womenListDiv.appendChild(card);
+
+        const base = BASE_LOCATIONS[woman.baseLoc] || BASE_LOCATIONS["Praia Grande / Reviver"];
+        regionCounters[woman.baseLoc] = (regionCounters[woman.baseLoc] || 0) + 1;
+        const count = regionCounters[woman.baseLoc];
+
+        const angle = count * 1.35; 
+        const radius = (count - 1) * 2.2; 
+        const posX = Math.min(Math.max(base.x + Math.cos(angle) * radius, 12), 88);
+        const posY = Math.min(Math.max(base.y + Math.sin(angle) * radius, 12), 88);
+
+        const pinColor = woman.level === 1 ? '#e63946' : (woman.level === 2 ? '#0284c7' : '#d97706');
+
+        const pin = document.createElement('div');
+        pin.className = 'map-pin';
+        pin.style.left = `${posX}%`;
+        pin.style.top = `${posY}%`;
+        pin.style.backgroundColor = pinColor;
+        pin.style.borderColor = '#ffffff';
+        pin.style.zIndex = Math.floor(10 + count);
+        pin.title = `${woman.name} (${woman.locationLabel})`;
+        pin.onclick = (e) => {
+          e.stopPropagation();
+          openModal(woman);
+        };
+
+        pinsLayer.appendChild(pin);
+      });
+    }
+
+    function filterLevel(level) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-level') === level) {
+          btn.classList.add('active');
+        }
+      });
+
+      if (level === 'all') {
+        renderApp(womenData);
+      } else {
+        const filtered = womenData.filter(w => w.level === parseInt(level));
+        renderApp(filtered);
+      }
+    }
+
+    function openModal(woman) {
+      const modalImg = document.getElementById('modalImg');
+      
+      if (woman.img) {
+        modalImg.src = woman.img;
+        modalImg.style.display = 'block';
+      } else {
+        modalImg.src = '';
+        modalImg.style.display = 'none';
+      }
+
+      document.getElementById('modalName').innerText = woman.name;
+      document.getElementById('modalPeriod').innerText = woman.period;
+      document.getElementById('modalArea').innerText = woman.area;
+      document.getElementById('modalImpact').innerText = woman.impact;
+      document.getElementById('modalCategory').innerText = `${woman.cat} (${woman.subcat})`;
+      document.getElementById('modalLocation').innerText = woman.locationLabel;
+      document.getElementById('modalBio').innerText = woman.bio;
+
+      const badge = document.getElementById('modalBadge');
+      badge.innerText = `Nível ${woman.level} - ${woman.cat}`;
+      badge.className = `badge badge-${woman.level}`;
+
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    // Controle de Zoom e Pan para o mapa original
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+
+    const mapTransform = document.getElementById('mapTransform');
+    const mapWrapper = document.getElementById('mapWrapper');
+
+    function updateTransform() {
+      mapTransform.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+
+    function zoomIn() {
+      scale = Math.min(scale * 1.25, 4);
+      updateTransform();
+    }
+
+    function zoomOut() {
+      scale = Math.max(scale / 1.25, 1);
+      if (scale === 1) {
+        panX = 0;
+        panY = 0;
+      }
+      updateTransform();
+    }
+
+    function resetZoom() {
+      scale = 1;
+      panX = 0;
+      panY = 0;
+      updateTransform();
+    }
+
+    // Eventos de Arrastar (Mouse e Toque)
+    mapWrapper.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.map-pin') || e.target.closest('.zoom-btn')) return;
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    // Suporte a Toque em Celulares e Tablets
+    mapWrapper.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.map-pin') || e.target.closest('.zoom-btn')) return;
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX - panX;
+        startY = e.touches[0].clientY - panY;
+      }
+    }, { passive: true });
+
+    mapWrapper.addEventListener('touchmove', (e) => {
+      if (!isDragging || e.touches.length !== 1) return;
+      panX = e.touches[0].clientX - startX;
+      panY = e.touches[0].clientY - startY;
+      updateTransform();
+    }, { passive: true });
+
+    mapWrapper.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    // Zoom com a roda do mouse
+    mapWrapper.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = 1.1;
+      if (e.deltaY < 0) {
+        scale = Math.min(scale * zoomFactor, 4);
+      } else {
+        scale = Math.max(scale / zoomFactor, 1);
+        if (scale === 1) {
+          panX = 0;
+          panY = 0;
+        }
+      }
+      updateTransform();
+    }, { passive: false });
+
+    renderApp(womenData);
